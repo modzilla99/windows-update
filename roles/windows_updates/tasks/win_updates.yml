@@ -1,0 +1,22 @@
+---
+- name: Update Installation
+  block:
+  - name: Increment the retry count
+    set_fact:
+      retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
+  - name: Installing Windows Updates
+    ignore_errors: true
+    win_updates:
+      category_names: ['SecurityUpdates','CriticalUpdates','UpdateRollups', 'Updates', 'DefinitionUpdates']
+    register: win_update
+  - debug: var=win_update
+  - win_reboot:
+    when: win_update.reboot_required or win_update.failed or ( win_update.installed_update_count != {{ win_update.found_update_count }} )
+    failed_when: 'win_update.failed or win_update.reboot_required or ( win_update.installed_update_count != {{ win_update.found_update_count }} )'
+  rescue:
+    - fail:
+        msg: Maximum retries of grouped tasks reached
+      when: retry_count | int == max_retries | int 
+    - debug:
+        msg: "Installing Updates failed, retrying..."
+    - include_tasks: win_updates.yml
