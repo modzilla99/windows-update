@@ -7,6 +7,7 @@
 - name:  Windows Update
   hosts: all
   gather_facts: false
+  become: true
   tasks:
     - name: Running Windows Update
       win_updates:
