@@ -8,15 +8,21 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: Running Windows Update
-      win_updates:
-        category_names: ['SecurityUpdates','CriticalUpdates','UpdateRollups', 'Updates', 'DefinitionUpdates']
-        #category_names: ['SecurityUpdates']
-      register: result
+    - name: Update Installation
+      until: win_update.found_update_count == 0
+      retries: 3
+      delay: 10
+      block:
+      - name: Running Windows Update
+        ignore_errors: true
+        win_updates:
+          category_names: ['SecurityUpdates','CriticalUpdates','UpdateRollups', 'Updates', 'DefinitionUpdates']
+          #category_names: ['SecurityUpdates']
+        register: win_update
 
-    # output results
-    - debug: var=result
+      # output results
+      - debug: var=win_update
 
-    # reboot only if required
-    - win_reboot:
-      when: result.reboot_required
+      # reboot only if required
+      - win_reboot:
+        when: win_update.reboot_required
