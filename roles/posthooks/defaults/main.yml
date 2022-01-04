@@ -1,0 +1,8 @@
+---
+snapshot_name: AutoSnapshot before Sysupgrade
+snapshot_description: This Snapshot is automatically created by Ansible and should only be removed if the playbook failed to autoremove it. 
+
+vcenter_datacenter: "DC01"
+vcenter_hostname: "vsphere.local"
+vcenter_username: "Administrator@vsphere.local"
+vcenter_password: "password"

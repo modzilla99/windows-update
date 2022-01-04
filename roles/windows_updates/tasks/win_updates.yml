@@ -2,21 +2,46 @@
 - name: Update Installation
   block:
   - name: Increment the retry count
+    when: win_update is undefined or win_update.failed
     set_fact:
       retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
   - name: Installing Windows Updates
     ignore_errors: true
     win_updates:
-      category_names: ['SecurityUpdates','CriticalUpdates','UpdateRollups', 'Updates', 'DefinitionUpdates']
+      category_names: "{{ update_categories }}"
     register: win_update
   - debug: var=win_update
   - win_reboot:
+      reboot_timeout: 3600
+      post_reboot_delay: 60
     when: win_update.reboot_required or win_update.failed or ( win_update.installed_update_count != {{ win_update.found_update_count }} )
     failed_when: 'win_update.failed or win_update.reboot_required or ( win_update.installed_update_count != {{ win_update.found_update_count }} )'
   rescue:
+    - name: Restoring VM to Snapshot taken
+      when: retry_count | int == max_retries | int
+      local_action:
+        module: vmware_guest_snapshot
+        datacenter: "{{ vcenter_datacenter }}"
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: False
+        uuid: "{{ machine[0].uuid }}"
+        snapshot_name: "{{ snapshot_name }}"
+        state: revert
+    - name: Start restored VM
+      when: retry_count | int == max_retries | int
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: False
+        uuid: "{{ machine[0].uuid }}"
+        state: poweredon
     - fail:
         msg: Maximum retries of grouped tasks reached
       when: retry_count | int == max_retries | int 
-    - debug:
+    - when: win_update.failed or ( win_update.installed_update_count != win_update.found_update_count )
+      debug:
         msg: "Installing Updates failed, retrying..."
     - include_tasks: win_updates.yml

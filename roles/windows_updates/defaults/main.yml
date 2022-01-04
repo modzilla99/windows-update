@@ -1,2 +1,10 @@
 max_retries: 5
 retry_delay: 10
+
+snapshot_name: AutoSnapshot before Sysupgrade
+vcenter_datacenter: DC01 
+vcenter_hostname: vsphere.local
+vcenter_username: Administrator@vsphere.local
+vcenter_password: password
+
+update_categories: ['SecurityUpdates','CriticalUpdates','UpdateRollups', 'Updates', 'DefinitionUpdates']

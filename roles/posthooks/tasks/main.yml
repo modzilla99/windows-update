@@ -1,0 +1,12 @@
+---
+- name: Removing old Snapshot
+  local_action:
+    module: vmware_guest_snapshot
+    datacenter: "{{ vcenter_datacenter }}"
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: False
+    uuid: "{{ machine[0].uuid }}"
+    snapshot_name: "{{ snapshot_name }}"
+    state: absent

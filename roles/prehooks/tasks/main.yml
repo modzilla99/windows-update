@@ -1,0 +1,9 @@
+---
+- name: Gather space usage on drive C
+  win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
+  register: diskspace
+
+- name: Check if free space is below 10Gi
+  set_fact:
+    diskfree: "{{ diskspace.stdout|from_json }}"
+  failed_when: diskfree.Free | int < min_disk_free | int

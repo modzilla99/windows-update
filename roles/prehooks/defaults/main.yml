@@ -1,0 +1,3 @@
+---
+# Size that has to be available on drive C:
+min_disk_free: 10737418240

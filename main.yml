@@ -4,10 +4,26 @@
 # http://docs.ansible.com/ansible/win_updates_module.html
 # https://docs.ansible.com/ansible/win_reboot_module.html
 
-- name:  Windows Update
+- name: Snapshot
   hosts: all
   gather_facts: false
+  connection: local
   roles:
+  - name: Create VMWare Snapshot
+    role: vmware_snapshot
+    tag: snapshot
+
+- name:  Windows Update
+  hosts: sys
+  tags: updates
+  gather_facts: false
+  roles:
+    - name: Prehooks
+      role: prehooks
+      tag: prehooks
     - name: Installing WindowsUpdates
       role: windows_updates
       tag: windows_updates 
+    - name: Posthooks
+      role: posthooks
+      tag: posthooks
