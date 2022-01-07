@@ -2,46 +2,54 @@
 - name: Update Installation
   block:
   - name: Increment the retry count
-    when: win_update is undefined or win_update.failed
+    when: win_update is undefined or ( win_update.failed and win_update.installed_update_count == 0 )
     set_fact:
       retry_count: "{{ 0 if retry_count is undefined else retry_count | int + 1 }}"
   - name: Installing Windows Updates
     ignore_errors: true
     win_updates:
-      category_names: "{{ update_categories }}"
+      reboot: true
+      reboot_timeout: 3600
+      skip_optional: "{{ updates_skip_optional }}"
+      reject_list: "{{ updates_blacklist }}"
+      category_names: "{{ updates_categories }}"
     register: win_update
+  - name: Wait for TrustedInstaller
+    when: win_update.failed_update_count > 0
+    win_shell: |
+      function Test-ProcessRunning {
+        param (
+          [Int]$Wait
+        )
+
+        $Timer = 0
+        do {
+          $Timer += 1
+          Sleep $Wait
+          $Processes = (Get-Process).ProcessName
+        }
+        until (
+          $Processes -notcontains "TrustedInstaller" -and $Processes -notcontains "TiWorker" -or $Timer -eq 60
+        )
+        echo "Process finished on try $Timer"
+      }
+
+      Test-ProcessRunning -Wait 40
+      Test-ProcessRunning -Wait 20
+      Test-ProcessRunning -Wait 10
+      Test-ProcessRunning -Wait 5
   - debug: var=win_update
   - win_reboot:
       reboot_timeout: 3600
       post_reboot_delay: 60
-    when: win_update.reboot_required or win_update.failed or ( win_update.installed_update_count != {{ win_update.found_update_count }} )
-    failed_when: 'win_update.failed or win_update.reboot_required or ( win_update.installed_update_count != {{ win_update.found_update_count }} )'
+    when: win_update.reboot_required or win_update.failed or ( win_update.installed_update_count != win_update.found_update_count )
+    failed_when: 'win_update.failed or win_update.reboot_required or ( win_update.installed_update_count != win_update.found_update_count )'
   rescue:
-    - name: Restoring VM to Snapshot taken
-      when: retry_count | int == max_retries | int
-      local_action:
-        module: vmware_guest_snapshot
-        datacenter: "{{ vcenter_datacenter }}"
-        hostname: "{{ vcenter_hostname }}"
-        username: "{{ vcenter_username }}"
-        password: "{{ vcenter_password }}"
-        validate_certs: False
-        uuid: "{{ machine[0].uuid }}"
-        snapshot_name: "{{ snapshot_name }}"
-        state: revert
-    - name: Start restored VM
-      when: retry_count | int == max_retries | int
-      vmware_guest:
-        hostname: "{{ vcenter_hostname }}"
-        username: "{{ vcenter_username }}"
-        password: "{{ vcenter_password }}"
-        validate_certs: False
-        uuid: "{{ machine[0].uuid }}"
-        state: poweredon
-    - fail:
-        msg: Maximum retries of grouped tasks reached
-      when: retry_count | int == max_retries | int 
+    - name: Retry limit exceeded, falling back...
+      set_fact:
+        update_successful: false
+      when: retry_count | int == updates_max_retries | int 
     - when: win_update.failed or ( win_update.installed_update_count != win_update.found_update_count )
       debug:
-        msg: "Installing Updates failed, retrying..."
+        msg: "Not all updates installed correctly, retrying..."
     - include_tasks: win_updates.yml

@@ -7,4 +7,8 @@ vcenter_hostname: vsphere.local
 vcenter_username: Administrator@vsphere.local
 vcenter_password: password
 
-update_categories: ['SecurityUpdates','CriticalUpdates','UpdateRollups', 'Updates', 'DefinitionUpdates']
+updates_max_retries: 5
+updates_skip_optional: true
+# A list of update titles or KB numbers that can be used to specify which updates are to be excluded from installation
+updates_blacklist: []
+updates_categories: ['SecurityUpdates','CriticalUpdates','UpdateRollups', 'Updates', 'DefinitionUpdates']

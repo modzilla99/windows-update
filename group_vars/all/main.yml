@@ -1,7 +1,13 @@
+#
+# Ansible connection settings
+#
+
 ansible_connection: winrm
 ansible_winrm_transport: ntlm
 ansible_winrm_port: 5985
+# Username that ansible will use to connect to hosts 
 ansible_user: svc-ansible
+# Created with `ansible-vault encrypt_string '<password>' --name ansible_password --vault-password-file pwfile.txt`
 ansible_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           64356633373064633138643831303761623762326630363236383830636538363531323962643237
@@ -10,7 +16,12 @@ ansible_password: !vault |
           3966303463356136360a373135373965643339636134353138356665363637383630383038633165
           64363138613666333836653062383233663539336264663865393631623362393934
 
+#
+# Settings specific vCenter
+#
+
 vcenter_username: "Administrator@vsphere.local"
+# Created with `ansible-vault encrypt_string '<password>' --name vcenter_password --vault-password-file pwfile.txt`
 vcenter_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           35643562346132313966313232363634323165666130313332303865363837613565633938396234
@@ -25,7 +36,21 @@ vcenter_vmname: "{{ inventory_hostname | upper }}"
 snapshot_name: "Ansible-Snapshot"
 snapshot_description: "Automatically created by ansible"
 
-update_categories:
+
+#
+# Settings specific to the update procedure
+#
+
+# Number of times that nodes try to install failed updates before reverting to snaphot
+updates_max_retries: 5
+updates_skip_optional: true
+
+# A list of update titles or KB numbers that can be used to specify which updates are to be excluded from installation
+#updates_blacklist: 
+#  - KB5008218
+
+# Sets the update categories that will get installed, more info https://docs.ansible.com/ansible/latest/collections/ansible/windows/win_updates_module.html#parameter-category_names 
+updates_categories:
   - Feature Packs
   - Drivers
   - Updates
@@ -33,3 +58,13 @@ update_categories:
   - SecurityUpdates
   - CriticalUpdates
   - DefinitionUpdates
+
+
+#
+# Posthook Settings
+#
+
+# Automatically rolls back to snapshot in case of an error
+posthooks_rollback: true
+# Automatically removes snapshot after update installation
+posthooks_autoremove: true

@@ -1,7 +1,31 @@
 ---
+- name: Fallback
+  when: posthooks_rollback and update_successful | default(true) == false
+  block:
+  - name: Restoring VM to Snapshot taken
+    delegate_to: localhost
+    vmware_guest_snapshot:
+      datacenter: "{{ vcenter_datacenter }}"
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: False
+      uuid: "{{ machine[0].uuid }}"
+      snapshot_name: "{{ snapshot_name }}"
+      state: revert
+  - name: Start restored VM
+    delegate_to: localhost
+    vmware_guest:
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+      validate_certs: False
+      uuid: "{{ machine[0].uuid }}"
+      state: poweredon
 - name: Removing old Snapshot
-  local_action:
-    module: vmware_guest_snapshot
+  when: posthooks_autoremove
+  delegate_to: localhost
+  vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"

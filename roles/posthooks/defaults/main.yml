@@ -6,3 +6,6 @@ vcenter_datacenter: "DC01"
 vcenter_hostname: "vsphere.local"
 vcenter_username: "Administrator@vsphere.local"
 vcenter_password: "password"
+
+posthooks_rollback: true
+posthooks_autoremove: true

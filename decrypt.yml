@@ -1,0 +1,7 @@
+- name: Decrypter
+  hosts: localhost
+  tasks:
+    - name: Decrypting secret
+      delegate_to: localhost
+      debug:
+        msg: "{{ ansible_password }}"
