@@ -6,7 +6,7 @@
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
-    validate_certs: False
+    validate_certs: "{{ vcenter_certifcate_validation }}"
   register: facts
 
 - name: Create list of machines to snapshot
@@ -25,7 +25,7 @@
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
-    validate_certs: False
+    validate_certs: "{{ vcenter_certifcate_validation }}"
     uuid: "{{ machine[0].uuid }}"
     #name: "{{ vcenter_vmname }}"
     #folder: "/{{ datacenter }}/vm/"
@@ -40,7 +40,7 @@
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
-    validate_certs: False
+    validate_certs: "{{ vcenter_certifcate_validation }}"
     uuid: "{{ machine[0].uuid }}"
     #name: "{{ vcenter_vmname }}"
     #folder: "/{{ datacenter }}/vm/"

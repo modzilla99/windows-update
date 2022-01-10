@@ -4,5 +4,6 @@ snapshot_description: This Snapshot is automatically created by Ansible and shou
 
 vcenter_datacenter: "DC01"
 vcenter_hostname: "vsphere.local"
+vcenter_certifcate_validation: True
 vcenter_username: "Administrator@vsphere.local"
 vcenter_password: "password"

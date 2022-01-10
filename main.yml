@@ -8,6 +8,7 @@
   hosts: all
   gather_facts: false
   connection: local
+  strategy: linear
   roles:
   - name: Create VMWare Snapshot
     role: vmware_snapshot

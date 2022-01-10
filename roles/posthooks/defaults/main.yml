@@ -4,8 +4,27 @@ snapshot_description: This Snapshot is automatically created by Ansible and shou
 
 vcenter_datacenter: "DC01"
 vcenter_hostname: "vsphere.local"
+vcenter_certifcate_validation: True
 vcenter_username: "Administrator@vsphere.local"
 vcenter_password: "password"
 
 posthooks_rollback: true
 posthooks_autoremove: true
+
+
+mail_enabled: false
+mail_status_error: 
+  msg: No status available
+mail:
+  host: mail.local
+  port: 25
+  secure: starttls
+  username: {}
+  password: {}
+  from: "ansible@mail.local (Ansible No-Reply)"
+  to: User <user@mail.local>
+  subject: Patching of {{ inventory_hostname }} succeded
+  body: |
+    {{ inventory_hostname }} was successfully patched!
+    This is the status:
+      {{ win_update | default("{'msg': 'No status available'}") | to_nice_json }}

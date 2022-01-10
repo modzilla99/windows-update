@@ -9,7 +9,7 @@
       hostname: "{{ vcenter_hostname }}"
       username: "{{ vcenter_username }}"
       password: "{{ vcenter_password }}"
-      validate_certs: False
+      validate_certs: "{{ vcenter_certifcate_validation }}"
       uuid: "{{ machine[0].uuid }}"
       snapshot_name: "{{ snapshot_name }}"
       state: revert
@@ -19,7 +19,7 @@
       hostname: "{{ vcenter_hostname }}"
       username: "{{ vcenter_username }}"
       password: "{{ vcenter_password }}"
-      validate_certs: False
+      validate_certs: "{{ vcenter_certifcate_validation }}"
       uuid: "{{ machine[0].uuid }}"
       state: poweredon
 - name: Removing old Snapshot
@@ -30,7 +30,20 @@
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
-    validate_certs: False
+    validate_certs: "{{ vcenter_certifcate_validation }}"
     uuid: "{{ machine[0].uuid }}"
     snapshot_name: "{{ snapshot_name }}"
     state: absent
+- name: Sending E-Mail
+  when: mail_enabled
+  delegate_to: localhost
+  community.general.mail:
+    host: "{{ mail.host }}"
+    port: "{{ mail.port }}"
+    username: "{{ mail.username }}"
+    password: "{{ mail.password }}"
+    from: "{{ mail.from }}"
+    secure: "{{ mail.secure }}"
+    to: "{{ mail.to }}"
+    subject: "{{ mail.subject }}"
+    body: "{{ mail.body }}"

@@ -31,6 +31,7 @@ vcenter_password: !vault |
           34363034653061646138633738613830383764303638666137383735306666313832
 vcenter_datacenter: DC01
 vcenter_hostname: vsphere.local
+vcenter_certifcate_validation: False
 vcenter_vmname: "{{ inventory_hostname | upper }}"
 
 snapshot_name: "Ansible-Snapshot"
@@ -68,3 +69,17 @@ updates_categories:
 posthooks_rollback: true
 # Automatically removes snapshot after update installation
 posthooks_autoremove: true
+mail_enabled: true
+mail:
+  host: mail.local
+  port: 25
+  secure: starttls
+  username: {}
+  password: {}
+  from: "ansible@mail.local (Ansible No-Reply)"
+  to: User <user@mail.local>
+  subject: Patching of {{ inventory_hostname }} succeded
+  body: |
+    {{ inventory_hostname }} was successfully patched!
+    This is the status:
+      {{ win_update | default(mail_status_error) | to_nice_json }}

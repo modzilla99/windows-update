@@ -15,7 +15,7 @@
       category_names: "{{ updates_categories }}"
     register: win_update
   - name: Wait for TrustedInstaller
-    when: win_update.failed_update_count > 0
+    when: win_update.failed_update_count is defined and win_update.failed_update_count > 0
     win_shell: |
       function Test-ProcessRunning {
         param (
@@ -34,7 +34,6 @@
         echo "Process finished on try $Timer"
       }
 
-      Test-ProcessRunning -Wait 40
       Test-ProcessRunning -Wait 20
       Test-ProcessRunning -Wait 10
       Test-ProcessRunning -Wait 5
