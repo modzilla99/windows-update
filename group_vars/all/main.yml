@@ -69,7 +69,9 @@ updates_categories:
 posthooks_rollback: true
 # Automatically removes snapshot after update installation
 posthooks_autoremove: true
+# Enables Mail delivery after playbook run
 mail_enabled: true
+# Examples for the supported mail delivery settings: https://docs.ansible.com/ansible/latest/collections/community/general/mail_module.html
 mail:
   host: mail.local
   port: 25
@@ -78,8 +80,3 @@ mail:
   password: {}
   from: "ansible@mail.local (Ansible No-Reply)"
   to: User <user@mail.local>
-  subject: Patching of {{ inventory_hostname }} succeded
-  body: |
-    {{ inventory_hostname }} was successfully patched!
-    This is the status:
-      {{ win_update | default(mail_status_error) | to_nice_json }}

@@ -9,12 +9,30 @@ vcenter_username: "Administrator@vsphere.local"
 vcenter_password: "password"
 
 posthooks_rollback: true
-posthooks_autoremove: true
+posthooks_autoremove: false
 
 
 mail_enabled: false
 mail_status_error: 
   msg: No status available
+
+mail_success_subject: Patching of {{ inventory_hostname }} succeded
+mail_success_message: |
+  {{ inventory_hostname }} was successfully patched!
+  This is the status:
+    {{ win_update | default(mail_status_error) | to_nice_json }}
+mail_failure_subject: Patching of {{ inventory_hostname }} failed
+mail_failure_message: |
+  {% if posthooks_rollback == true %}
+  {% set mail_msg = "As a result, the VM was reverted to the snapshot." %}
+  {% else %}
+  {% set mail_msg = "The VM was not changed, but it is strongly advised to roll back to the last Snapshot" %}
+  {% endif %}
+  {{ inventory_hostname }} failed to install updates. {{ mail_msg }}
+
+  This is the status of Windows Update:
+    {{ win_update | default(mail_status_error) | to_nice_json }}
+
 mail:
   host: mail.local
   port: 25
@@ -23,8 +41,3 @@ mail:
   password: {}
   from: "ansible@mail.local (Ansible No-Reply)"
   to: User <user@mail.local>
-  subject: Patching of {{ inventory_hostname }} succeded
-  body: |
-    {{ inventory_hostname }} was successfully patched!
-    This is the status:
-      {{ win_update | default("{'msg': 'No status available'}") | to_nice_json }}

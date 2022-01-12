@@ -14,7 +14,7 @@
     role: vmware_snapshot
     tag: snapshot
 
-- name:  Windows Update
+- name: Windows Update
   hosts: sys
   tags: updates
   gather_facts: false

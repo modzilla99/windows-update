@@ -1,8 +1,8 @@
 ---
 - name: Gather Facts of all VMs in variable machines.
   when: inventory_hostname in groups['local']
-  local_action:
-    module: vmware_vm_info
+  delegate_to: localhost
+  vmware_vm_info:
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
@@ -19,31 +19,27 @@
     msg: "{{ machine[0].uuid }}"
 - name: Remove old VM-Snapshots
   when: inventory_hostname not in groups['local']
-  local_action:
-    module: vmware_guest_snapshot
+  delegate_to: localhost
+  vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     validate_certs: "{{ vcenter_certifcate_validation }}"
     uuid: "{{ machine[0].uuid }}"
-    #name: "{{ vcenter_vmname }}"
-    #folder: "/{{ datacenter }}/vm/"
     state: absent
     snapshot_name: "{{ snapshot_name }}"
     description: "{{ snapshot_description }}"
 - name: Create new VM-Snapshots
   when: inventory_hostname not in groups['local']
-  local_action:
-    module: vmware_guest_snapshot
+  delegate_to: localhost
+  vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     validate_certs: "{{ vcenter_certifcate_validation }}"
     uuid: "{{ machine[0].uuid }}"
-    #name: "{{ vcenter_vmname }}"
-    #folder: "/{{ datacenter }}/vm/"
     state: present
     snapshot_name: "{{ snapshot_name }}"
     description: "{{ snapshot_description }}"

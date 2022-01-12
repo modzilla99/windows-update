@@ -34,8 +34,8 @@
     uuid: "{{ machine[0].uuid }}"
     snapshot_name: "{{ snapshot_name }}"
     state: absent
-- name: Sending E-Mail
-  when: mail_enabled
+- name: Sending E-Mail (unsuccessful)
+  when: mail_enabled and update_successful | default(true) == false
   delegate_to: localhost
   community.general.mail:
     host: "{{ mail.host }}"
@@ -45,5 +45,18 @@
     from: "{{ mail.from }}"
     secure: "{{ mail.secure }}"
     to: "{{ mail.to }}"
-    subject: "{{ mail.subject }}"
-    body: "{{ mail.body }}"
+    subject: "{{ mail_failure_subject }}"
+    body: "{{ mail_failure_message }}"
+- name: Sending E-Mail (successful)
+  when: mail_enabled and update_successful | default(true)
+  delegate_to: localhost
+  community.general.mail:
+    host: "{{ mail.host }}"
+    port: "{{ mail.port }}"
+    username: "{{ mail.username }}"
+    password: "{{ mail.password }}"
+    from: "{{ mail.from }}"
+    secure: "{{ mail.secure }}"
+    to: "{{ mail.to }}"
+    subject: "{{ mail_success_subject }}"
+    body: "{{ mail_success_message }}"
