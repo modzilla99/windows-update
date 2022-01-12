@@ -1,0 +1,11 @@
+{% if update_successful | default(true) == false %}
+{% if posthooks_rollback == true %}
+{{ inventory_hostname }} failed to install updates. As a result, the VM was reverted to the snapshot.
+{% else %}
+{{ inventory_hostname }} failed to install updates but the VM was not rolled back, please make sure all Services still work as expected and roll back if needed.
+{% endif %}
+{% else %}
+{{ inventory_hostname }} was successfully patched! Please make sure all Services still work as expected.
+{% endif %}
+This is the log of the Windows Update module:
+{{ win_update | default(mail_status_error) | to_nice_json }}

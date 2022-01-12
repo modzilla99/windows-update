@@ -68,9 +68,10 @@ updates_categories:
 # Automatically rolls back to snapshot in case of an error
 posthooks_rollback: true
 # Automatically removes snapshot after update installation
-posthooks_autoremove: true
+posthooks_autoremove: false
+
 # Enables Mail delivery after playbook run
-mail_enabled: true
+mail_enabled: false
 # Examples for the supported mail delivery settings: https://docs.ansible.com/ansible/latest/collections/community/general/mail_module.html
 mail:
   host: mail.local
@@ -80,3 +81,6 @@ mail:
   password: {}
   from: "ansible@mail.local (Ansible No-Reply)"
   to: User <user@mail.local>
+
+webhook_enabled: false
+webhook_url: 'https://outlook.office.com/webhook/your_webhook_url'

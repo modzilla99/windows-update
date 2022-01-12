@@ -1,0 +1,68 @@
+{% if update_successful | default(true) == false %}
+{% if posthooks_rollback == true %}
+{% set header_msg = "was reverted to the Snapshot" %}
+{% else %}
+{% set header_msg = "failed to patch" %}
+{% endif %}
+{% else %}
+{% set header_msg = "was sucessfully patched" %}
+{% endif %}
+{
+    "type": "message",
+    "attachments": [
+      {
+        "contentType": "application/vnd.microsoft.card.adaptive",
+        "contentUrl": null,
+        "content": {
+          "type": "AdaptiveCard",
+          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+          "version": "1.2",
+          "body": [
+            {
+              "type": "TextBlock",
+              "weight": "Bolder",
+              "size": "Medium",
+              "style": "heading",
+              "wrap": true,
+              "text": "({{ inventory_hostname }}) System {{ header_msg }}"
+            },
+            {
+              "text": "{{ '%Y-%m-%d %H:%M:%S' | strftime }}",
+              "type": "TextBlock",
+              "spacing": "Small",
+              "size": "Small"
+            },
+            {
+              "text": "Ansible installed {{ win_update.installed_update_count }} Updates.",
+              "type": "TextBlock"
+            },
+            {
+              "type": "FactSet",
+              "facts": [
+                {
+                  "title": "Updates Found",
+                  "value": "{{ win_update.found_update_count }}"
+                },
+                {
+                  "title": "Updates filtered",
+                  "value": "{{ win_update.filtered_updates | to_nice_json | replace('"','\\"') }}"
+                },
+                {
+                  "title": "Updates Installed",
+                  "value": "{{ win_update.installed_update_count }}"
+                },
+                {
+                  "title": "Updates Failed",
+                  "value": "{{ win_update.failed_update_count }}"
+                },
+                {
+                  "title": "Full Status",
+                  "value": "{{ win_update | to_nice_json | replace('"','\\"') }}"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }

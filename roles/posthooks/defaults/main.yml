@@ -15,23 +15,13 @@ posthooks_autoremove: false
 mail_enabled: false
 mail_status_error: 
   msg: No status available
-
-mail_success_subject: Patching of {{ inventory_hostname }} succeded
-mail_success_message: |
-  {{ inventory_hostname }} was successfully patched!
-  This is the status:
-    {{ win_update | default(mail_status_error) | to_nice_json }}
-mail_failure_subject: Patching of {{ inventory_hostname }} failed
-mail_failure_message: |
-  {% if posthooks_rollback == true %}
-  {% set mail_msg = "As a result, the VM was reverted to the snapshot." %}
+mail_subject: |
+  {% if update_successful | default(true) == false %}
+  Patching of {{ inventory_hostname }} failed
   {% else %}
-  {% set mail_msg = "The VM was not changed, but it is strongly advised to roll back to the last Snapshot" %}
+  Patching of {{ inventory_hostname }} succeded
   {% endif %}
-  {{ inventory_hostname }} failed to install updates. {{ mail_msg }}
-
-  This is the status of Windows Update:
-    {{ win_update | default(mail_status_error) | to_nice_json }}
+mail_message: "{{ lookup('template', 'mail_message.j2') }}"
 
 mail:
   host: mail.local
@@ -41,3 +31,10 @@ mail:
   password: {}
   from: "ansible@mail.local (Ansible No-Reply)"
   to: User <user@mail.local>
+
+
+webhook_enabled: false
+webhook_status_error: 
+  msg: No status available
+webhook_url: 'https://outlook.office.com/webhook/your_webhook_url'
+message: "{{ lookup('template', 'webhook_message.j2') }}"
