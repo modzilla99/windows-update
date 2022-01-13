@@ -7,6 +7,7 @@
     msg: "{{ machine }}"
 - name: Remove old VM-Snapshots
   delegate_to: localhost
+  changed_when: snaphot_remove.invalid is defined
   community.vmware.vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"
@@ -19,6 +20,7 @@
     description: "{{ snapshot_description }}"
 - name: Create new VM-Snapshots
   delegate_to: localhost
+  changed_when: snaphot_create.invalid is defined
   community.vmware.vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"

@@ -2,6 +2,8 @@
 - name: Gather space usage on drive C
   win_shell: Get-PSDrive C | Select-Object Free | ConvertTo-Json
   register: diskspace
+  changed_when: diskspace.rc >= 10000 
+  failed_when: diskspace.rc >= 1
 
 - name: Check if free space is below 10Gi
   set_fact:
