@@ -1,0 +1,33 @@
+plugin: vmware_vm_inventory
+strict: True
+hostnames:
+- 'config.name'
+hostname: vsphere.local
+username: svac-ansible@vsphere.local
+password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          35643562346132313966313232363634323165666130313332303865363837613565633938396234
+          3939663065353764323566363465613162653632323537660a633038363262396532343530333538
+          34633164323565393162373666353831353065316636326663346136643130356530346330633035
+          3339316463643330390a306638366233616430643363633561646365623331316436346638313639
+          34363034653061646138633738613830383764303638666137383735306666313832
+validate_certs: False
+with_tags: True
+keyed_groups:
+- key: tags
+  prefix: "vm_tag_"
+  separator: ""
+- key: config.guestId
+  prefix: ''
+  separator: ''
+- key: summary.runtime.powerState
+  prefix: ''
+  separator: ''
+with_nested_properties: true
+filters:
+- config.template == false
+- config.guestId is match('windows*')
+- summary.runtime.powerState == "poweredOn"
+- guest.ipAddress is defined
+- '"windows.patchmgmt=true" in tags'
+

@@ -10,7 +10,7 @@
       username: "{{ vcenter_username }}"
       password: "{{ vcenter_password }}"
       validate_certs: "{{ vcenter_certifcate_validation }}"
-      uuid: "{{ machine[0].uuid }}"
+      uuid: "{{ machine }}"
       snapshot_name: "{{ snapshot_name }}"
       state: revert
   - name: Start restored VM
@@ -20,7 +20,7 @@
       username: "{{ vcenter_username }}"
       password: "{{ vcenter_password }}"
       validate_certs: "{{ vcenter_certifcate_validation }}"
-      uuid: "{{ machine[0].uuid }}"
+      uuid: "{{ machine }}"
       state: poweredon
 - name: Removing old Snapshot
   when: posthooks_autoremove
@@ -31,7 +31,7 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     validate_certs: "{{ vcenter_certifcate_validation }}"
-    uuid: "{{ machine[0].uuid }}"
+    uuid: "{{ machine }}"
     snapshot_name: "{{ snapshot_name }}"
     state: absent
 - name: Sending E-Mail

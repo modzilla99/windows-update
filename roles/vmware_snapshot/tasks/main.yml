@@ -1,24 +1,11 @@
 ---
-- name: Gather Facts of all VMs in variable machines.
-  when: inventory_hostname in groups['local']
-  delegate_to: localhost
-  community.vmware.vmware_vm_info:
-    hostname: "{{ vcenter_hostname }}"
-    username: "{{ vcenter_username }}"
-    password: "{{ vcenter_password }}"
-    validate_certs: "{{ vcenter_certifcate_validation }}"
-  register: facts
-
-- name: Create list of machines to snapshot
-  when: inventory_hostname not in groups['local']
+- name: Set vSphere uuid 
   set_fact:
-    machine: "{{ hostvars['localhost']['facts']['virtual_machines'] | selectattr('guest_name','eq',vcenter_vmname) | list }}"
+    machine: "{{ config.uuid }}"
 - name: Show machine uuid
-  when: inventory_hostname not in groups['local']
   debug:
-    msg: "{{ machine[0].uuid }}"
+    msg: "{{ machine }}"
 - name: Remove old VM-Snapshots
-  when: inventory_hostname not in groups['local']
   delegate_to: localhost
   community.vmware.vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
@@ -26,12 +13,11 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     validate_certs: "{{ vcenter_certifcate_validation }}"
-    uuid: "{{ machine[0].uuid }}"
+    uuid: "{{ machine }}"
     state: absent
     snapshot_name: "{{ snapshot_name }}"
     description: "{{ snapshot_description }}"
 - name: Create new VM-Snapshots
-  when: inventory_hostname not in groups['local']
   delegate_to: localhost
   community.vmware.vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
@@ -39,7 +25,7 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     validate_certs: "{{ vcenter_certifcate_validation }}"
-    uuid: "{{ machine[0].uuid }}"
+    uuid: "{{ machine }}"
     state: present
     snapshot_name: "{{ snapshot_name }}"
     description: "{{ snapshot_description }}"

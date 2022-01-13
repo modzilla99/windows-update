@@ -15,7 +15,7 @@
     tag: snapshot
 
 - name: Windows Update
-  hosts: sys
+  hosts: all
   tags: updates
   gather_facts: false
   roles:
