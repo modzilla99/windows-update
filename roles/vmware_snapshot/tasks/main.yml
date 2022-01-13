@@ -2,7 +2,7 @@
 - name: Gather Facts of all VMs in variable machines.
   when: inventory_hostname in groups['local']
   delegate_to: localhost
-  vmware_vm_info:
+  community.vmware.vmware_vm_info:
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
@@ -20,7 +20,7 @@
 - name: Remove old VM-Snapshots
   when: inventory_hostname not in groups['local']
   delegate_to: localhost
-  vmware_guest_snapshot:
+  community.vmware.vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
@@ -33,7 +33,7 @@
 - name: Create new VM-Snapshots
   when: inventory_hostname not in groups['local']
   delegate_to: localhost
-  vmware_guest_snapshot:
+  community.vmware.vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"

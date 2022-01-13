@@ -4,7 +4,7 @@
   block:
   - name: Restoring VM to Snapshot taken
     delegate_to: localhost
-    vmware_guest_snapshot:
+    community.vmware.vmware_guest_snapshot:
       datacenter: "{{ vcenter_datacenter }}"
       hostname: "{{ vcenter_hostname }}"
       username: "{{ vcenter_username }}"
@@ -15,7 +15,7 @@
       state: revert
   - name: Start restored VM
     delegate_to: localhost
-    vmware_guest:
+    community.vmware.vmware_guest:
       hostname: "{{ vcenter_hostname }}"
       username: "{{ vcenter_username }}"
       password: "{{ vcenter_password }}"
@@ -25,7 +25,7 @@
 - name: Removing old Snapshot
   when: posthooks_autoremove
   delegate_to: localhost
-  vmware_guest_snapshot:
+  community.vmware.vmware_guest_snapshot:
     datacenter: "{{ vcenter_datacenter }}"
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
