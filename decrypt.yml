@@ -1,7 +1,7 @@
 - name: Decrypter
-  hosts: localhost
+  hosts: localhost                     # Replace with hostname of node with host_vars set
   tasks:
     - name: Decrypting secret
       delegate_to: localhost
       debug:
-        msg: "{{ ansible_password }}"
+        msg: "{{ ansible_password }}"  # Replace with Variable that needs to be decrypted
